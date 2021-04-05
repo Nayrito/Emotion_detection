@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
-from sklearn.decomposition import FastICA, PCA
+from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.neighbors import KNeighborsClassifier
 from matplotlib import pyplot as plt
@@ -35,29 +35,39 @@ plt.legend(loc='best', shadow=False, scatterpoints=1)
 plt.title('datos crudos normalizados')
 plt.figure()
 
+#%% 
+
+
 #%% PCA (análisis de componentes principales)
 
-pcaObj = PCA(n_components=4)
+pcaObj = PCA(n_components=5)
 pca = pcaObj.fit_transform(data_norm)
 target_names = ['feliz','triste']
 for color, i, target_name in zip(colors, [2,5], target_names):
     plt.scatter(pca[labels == i, 0], pca[labels == i, 1], color=color, alpha=.8,lw=lw,label=target_name)
 plt.legend(loc='best', shadow=False, scatterpoints=1)
-plt.title('datos PCA nc=4')
+plt.title('datos PCA nc=5')
 plt.figure()
+plt.boxplot(pca)
+plt.title('PCA nc=5')
+plt.figure()
+
 
 #%% LDA análisis de discrimación lineal 
 
 ldaObj = LinearDiscriminantAnalysis(n_components=3)
 lda = ldaObj.fit(data_norm,labels).transform(data_norm)
-target_names = ['feliz','triste']
+target_names = ['feliz','sorpresa']
 
-for color, i, target_name in zip(colors, [2,5], target_names):
+for color, i, target_name in zip(colors, [2,4], target_names):
     plt.scatter(lda[labels == i, 0], lda[labels == i, 1], color=color, alpha=.8,lw=lw,label=target_name)
 plt.legend(loc='best', shadow=False, scatterpoints=1)
 plt.title('datos lda nc=3')
 plt.figure()
+plt.boxplot(lda)
+plt.figure()
 
+#%%
 
 
 
