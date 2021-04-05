@@ -26,7 +26,7 @@ for directorio in lista:
     
     label= label+1
 
-## local binary pattern LBPH##
+#%% local binary pattern LBPH##
 labels =np.asarray(labels)
 lbph_recognizer = cv2.face.LBPHFaceRecognizer_create() # creamos el objeto LBPH
 lbph_recognizer.train(data,labels) # entrenamos el algoritmo con las imagenes del dataset
