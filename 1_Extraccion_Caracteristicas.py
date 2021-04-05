@@ -10,7 +10,7 @@ import os
 import time
 #import imutils 
 
-path = "./Dataset_inteligencia" # actualizar carpeta para cada emocion
+path = "C:/Users/nairo/OneDrive/Documentos/semestre actual/Emotion_detection/Dataset_inteligencia" # actualizar carpeta para cada emocion
 lista = os.listdir(path) #convierte el contenido del pat en una lista 
 
 

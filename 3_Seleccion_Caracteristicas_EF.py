@@ -27,7 +27,7 @@ colors =['orange','green','blue','red','black','pink']
 
 #%% Datos crudos
 
-for color, i, target_name in zip(colors, [0,1], target_names):
+for color, i, target_name in zip(colors, [2,5], target_names):
     plt.scatter(data_norm[labels == i, 0], data_norm[labels == i, 1], color=color, alpha=.8,lw=lw,label=target_name)
 plt.legend(loc='best', shadow=False, scatterpoints=1)
 plt.title('datos crudos normalizados')
@@ -35,13 +35,13 @@ plt.figure()
 
 #%% PCA (análisis de componentes principales)
 
-pcaObj = PCA(n_components=4)
+pcaObj = PCA(n_components=5)
 pca = pcaObj.fit_transform(data_norm)
 target_names = ['feliz','triste']
 for color, i, target_name in zip(colors, [2,5], target_names):
     plt.scatter(pca[labels == i, 0], pca[labels == i, 1], color=color, alpha=.8,lw=lw,label=target_name)
 plt.legend(loc='best', shadow=False, scatterpoints=1)
-plt.title('datos PCA nc=4')
+plt.title('datos PCA nc=5')
 plt.figure()
 
 #%% LDA análisis de discrimación lineal 

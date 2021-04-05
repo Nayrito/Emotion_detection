@@ -21,51 +21,64 @@ labels = pd.read_csv("labels.csv").to_numpy()
 labels = labels.reshape(330)
 
 data_norm = (data - np.mean(data))/np.std(data) #normalizamos los datos 
-
 lw=2
 target_names = ['asco','enfado','feliz', 'neutral','sorpresa','triste']
 colors =['orange','green','blue','red','black','pink']
 
 
 #%% Datos crudos
-
-for color, i, target_name in zip(colors, [0,1], target_names):
+target_names = ['neutral','sorpresa']
+colors=['blue','red']
+for color, i, target_name in zip(colors, [3,4], target_names):
     plt.scatter(data_norm[labels == i, 0], data_norm[labels == i, 1], color=color, alpha=.8,lw=lw,label=target_name)
 plt.legend(loc='best', shadow=False, scatterpoints=1)
-plt.title('datos crudos normalizados')
+plt.title('Datos crudos normalizados')
 plt.figure()
 
-#%% 
+#%% PCA Razón de varianza acumulada 
 
+pca = PCA().fit(data_norm)
+plt.plot(np.cumsum(pca.explained_variance_ratio_))
+plt.title('Razón de varianza acumulada')
+plt.xlabel('número de componentes')
+plt.ylabel('varianza explicada acumulada');
+plt.grid()
 
 #%% PCA (análisis de componentes principales)
-
+target_names = ['neutral','sorpresa']
+colors=['blue','red']
 pcaObj = PCA(n_components=5)
 pca = pcaObj.fit_transform(data_norm)
-target_names = ['feliz','triste']
-for color, i, target_name in zip(colors, [2,5], target_names):
+for color, i, target_name in zip(colors, [3,4], target_names):
     plt.scatter(pca[labels == i, 0], pca[labels == i, 1], color=color, alpha=.8,lw=lw,label=target_name)
 plt.legend(loc='best', shadow=False, scatterpoints=1)
-plt.title('datos PCA nc=5')
+plt.title('Datos PCA nc=5')
 plt.figure()
-plt.boxplot(pca)
-plt.title('PCA nc=5')
-plt.figure()
+# plt.boxplot(pca)
+# plt.title('PCA nc=5')
+# plt.figure()
 
+#%% LDA Razón de varianza acumulada
+lda = LinearDiscriminantAnalysis().fit(data,labels)
+plt.plot(np.cumsum(lda.explained_variance_ratio_))
+plt.title('Razón de varianza acumulada')
+plt.xlabel('número de componentes')
+plt.ylabel('varianza explicada acumulada');
+plt.grid()
 
 #%% LDA análisis de discrimación lineal 
-
-ldaObj = LinearDiscriminantAnalysis(n_components=3)
+target_names = ['neutral','sorpresa']
+colors=['blue','red']
+ldaObj = LinearDiscriminantAnalysis(n_components=4)
 lda = ldaObj.fit(data_norm,labels).transform(data_norm)
-target_names = ['feliz','sorpresa']
-
-for color, i, target_name in zip(colors, [2,4], target_names):
+for color, i, target_name in zip(colors, [3,4], target_names):
     plt.scatter(lda[labels == i, 0], lda[labels == i, 1], color=color, alpha=.8,lw=lw,label=target_name)
 plt.legend(loc='best', shadow=False, scatterpoints=1)
-plt.title('datos lda nc=3')
+plt.title('Datos lda nc=4')
 plt.figure()
-plt.boxplot(lda)
-plt.figure()
+# plt.boxplot(lda)
+# plt.title('lda nc=5')
+# plt.figure()
 
 #%%
 
