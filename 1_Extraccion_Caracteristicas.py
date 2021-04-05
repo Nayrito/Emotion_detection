@@ -25,7 +25,7 @@ for directorio in lista:
         labels.append(label) # agregar etiquetas 
     
     label= label+1
-
+#%%
 ## local binary pattern LBPH##
 labels =np.asarray(labels)
 lbph_recognizer = cv2.face.LBPHFaceRecognizer_create() # creamos el objeto LBPH
@@ -34,10 +34,22 @@ hist = lbph_recognizer.getHistograms() # histogramas (características)
 
 hist = np.asarray(hist)
 hist = hist[:,0,:]  # se ajustan las dimensiones de las caracteristicas 
+
+#%%
+## EigenFaces ##
+labels =np.asarray(labels)
+EigenFaces_recognizer = cv2.face.EigenFaceRecognizer_create() # creamos el objeto LBPH
+EigenFaces_recognizer.train(data,labels) # entrenamos el algoritmo con las imagenes del dataset
+#vect = EigenFaces_recognizer.getEigenVectors() # histogramas (características)
+vect = EigenFaces_recognizer.getEigenVectors()
+
+vect = np.asarray(vect)
+vect = vect.reshape(331,122500)
+np.savetxt('caracteristicas_EF.csv',vect,delimiter=',',fmt="%f")
+
 #%%
 np.savetxt('labels.csv',labels,delimiter=' ',fmt='%s')
 np.savetxt('caracteristicas.csv',hist,delimiter=',',fmt="%f")
-
 
 
 
