@@ -71,24 +71,27 @@ target_names = ['neutral','sorpresa']
 colors=['blue','red']
 ldaObj = LinearDiscriminantAnalysis(n_components=4)
 lda = ldaObj.fit(data_norm,labels).transform(data_norm)
+
 for color, i, target_name in zip(colors, [3,4], target_names):
-    plt.scatter(lda[labels == i, 0], lda[labels == i, 1], color=color, alpha=.8,lw=lw,label=target_name)
+    plt.scatter(lda[labels == i, 0], lda[labels == i, 3], color=color, alpha=.8,lw=lw,label=target_name)
 plt.legend(loc='best', shadow=False, scatterpoints=1)
 plt.title('Datos lda nc=4')
 plt.figure()
 # plt.boxplot(lda)
 # plt.title('lda nc=5')
 # plt.figure()
-
-#%%
-
-
-
-
-
+np.savetxt('caracteristicas-lda.csv',lda,delimiter=',',fmt="%f")
+#%% análisis global lda 
+target_names = ['asco','enfado','feliz', 'neutral','sorpresa','triste']
+datos = [lda[:,0],lda[:,1]]
+colors =['orange','green','blue','red','black','pink']
 
 
-
+for color,i, target_name in zip(colors,[0,1,2,3,4,5], target_names):
+    plt.scatter( lda[labels == i,0],lda[labels == i,2],color=color, alpha=.8,lw=lw,label=target_name)
+plt.legend(loc='best', shadow=False, scatterpoints=1)
+plt.title('Datos lda nc=4')
+plt.figure()
 
 
 
