@@ -9,9 +9,9 @@ import os
 import numpy as np
 import keyboard
 
-cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(0,cv2.CAP_DSHOW) # inicio de captura 
 
-face_cascade = cv2.CascadeClassifier('C:/Users/nairo/anaconda3/Lib/site-packages/cv2/data/haarcascade_frontalface_default.xml')
+face_cascade = cv2.CascadeClassifier('C:/Users/nairo/anaconda3/Lib/site-packages/cv2/data/haarcascade_frontalface_default.xml') #path Nayro 
 #faceClassif = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 #face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml"')
 
@@ -28,12 +28,12 @@ while True:
         rostro = cv2.resize(rostro,(350,350),interpolation= cv2.INTER_CUBIC)
         cv2.rectangle(frame, (x,y),(x+w,y+h),(0,255,0),2)
     
-    cv2.imshow('rostro',frame)   
+    cv2.imshow('rostro',frame)
     
-    if keyboard.is_pressed('p'):
+    if cv2.waitKey(1) == ord('q'): 
+        break
          
-         print('se presionó [p]arar!')
-         break
+        
 
 
 cap.release()
