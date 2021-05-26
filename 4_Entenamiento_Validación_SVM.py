@@ -18,6 +18,8 @@ from sklearn.preprocessing import StandardScaler # normalizar datos
 from sklearn.svm import SVC # clasificador SVM
 from sklearn.metrics import accuracy_score # rendimiento para evaluar los splits 
 from sklearn.metrics import confusion_matrix
+from mpl_toolkits.mplot3d import axes3d
+
 
 
 
@@ -76,42 +78,76 @@ train2 = np.loadtxt('train2.txt')
 train3 = np.loadtxt('train3.txt')
 train4 = np.loadtxt('train4.txt')
 train5 = np.loadtxt('train5.txt')
+trains = [train1,train2,train3,train4,train5]
+
 test1 = np.loadtxt('test1.txt')
 test2 = np.loadtxt('test2.txt')
 test3 = np.loadtxt('test3.txt')
 test4 = np.loadtxt('test4.txt')
 test5 = np.loadtxt('test5.txt')
+tests = [test1,test2,test3,test4,test5]
+
 labelsTrain1 = np.loadtxt('labelsTrain1.txt')
 labelsTrain2 = np.loadtxt('labelsTrain2.txt')
 labelsTrain3 = np.loadtxt('labelsTrain3.txt')
 labelsTrain4 = np.loadtxt('labelsTrain4.txt')
 labelsTrain5 = np.loadtxt('labelsTrain5.txt')
+labelsTrains =[labelsTrain1,labelsTrain2,labelsTrain3,labelsTrain4,labelsTrain5]
+
 labelsTest1 = np.loadtxt('labelsTest1.txt')
 labelsTest2 = np.loadtxt('labelsTest2.txt')
 labelsTest3 = np.loadtxt('labelsTest3.txt')
 labelsTest4 = np.loadtxt('labelsTest4.txt')
 labelsTest5 = np.loadtxt('labelsTest5.txt')
+labelsTests =[labelsTest1,labelsTest2,labelsTest3,labelsTest4,labelsTest5]
 
 #%% 4. sistema de clasificacion y validación 
 
+Accuracy=[]
 gama=[0.01,0.05,0.1,0.5,1]
 kernel='rbf' # 'linear'
 C=1
-svm =SVC(kernel=kernel,C=C,gamma=1)  # definimos clasificador  // mejor gama 0.5
-svm.fit(train3,labelsTrain3)  # entrenar svm 
+for g in gama:
+    svm =SVC(kernel=kernel,C=C,gamma=g)
+    
+    for train,labelsTrain,test,labelsTest in zip(trains, labelsTrains, tests, labelsTests):
+        svm.fit(train,labelsTrain)
+        labels_pred = svm.predict(test)
+        accuracy = accuracy_score(labelsTest,labels_pred)
+        Accuracy.append(accuracy*100)
+        
+#%%5.Gráfica 3d para encontrar parametro gama ( mejor 0.5)
 
-labels_pred = svm.predict(test3)
-accuracy = accuracy_score(labelsTest3,labels_pred) # evaluamos rendimiento en cada split 
-print (accuracy)
+z = np.asarray(Accuracy)
+z = np.reshape(z,(5,5))
+#z = z.T
+x = [1,2,3,4,5]
+y= [0.01,0.05,0.1,0.5,1]
+fig = plt.figure()
+ax3d = plt.axes(projection="3d")
+X,Y = np.meshgrid(x,y)
+ax3d.plot_surface(X, Y, z,cmap='plasma',linewidth=0, )
+ax3d.view_init(25, 20)  #25,20
+ax3d.set_title('Accuracy')
+ax3d.set_xlabel('fold')
+ax3d.set_ylabel('gama')
+ax3d.set_zlabel('%')
+plt.show()
+#%% 6. Entrenar y guardar sistema entrenado
+from joblib import dump, load
 
+gama = 0.5
+kernel = 'rbf'
+C=1
+svm =SVC(kernel=kernel,C=C,gamma=g)
+svm.fit(train3,labelsTrain3)
+dump(svm, 'modelo_svm.joblib') 
 
-
-
-
-
-
-
-
+#%% Para cargarlo posteriormente 
+svm1 = load('modelo_svm.joblib')
+labels_pred = svm1.predict(test3)
+accuracy = accuracy_score(labelsTest3,labels_pred)
+print(accuracy)
 
 
 

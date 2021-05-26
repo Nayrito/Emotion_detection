@@ -8,7 +8,9 @@ import cv2
 import os
 import numpy as np
 import keyboard
+from joblib import dump, load
 
+svm = load('modelo_svm.joblib')
 cap = cv2.VideoCapture(0,cv2.CAP_DSHOW) # inicio de captura 
 
 face_cascade = cv2.CascadeClassifier('C:/Users/nairo/anaconda3/Lib/site-packages/cv2/data/haarcascade_frontalface_default.xml') #path Nayro 
@@ -26,6 +28,7 @@ while True:
     for (x,y,w,h) in faces:
         rostro = auxFrame[y:y+h,x:x+w]
         rostro = cv2.resize(rostro,(350,350),interpolation= cv2.INTER_CUBIC)
+        
         cv2.rectangle(frame, (x,y),(x+w,y+h),(0,255,0),2)
     
     cv2.imshow('rostro',frame)
