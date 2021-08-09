@@ -146,8 +146,8 @@ dump(svm, 'modelo_svm.joblib')
 #%% Para cargarlo posteriormente 
 svm1 = load('modelo_svm.joblib')
 labels_pred = svm1.predict(test3)
-accuracy = accuracy_score(labelsTest3,labels_pred)
-print(accuracy)
+#accuracy = accuracy_score(labelsTest3,labels_pred)
+#print(accuracy)
 
 
 
