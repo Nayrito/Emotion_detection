@@ -16,8 +16,7 @@ from matplotlib import pyplot as plt
 from sklearn.model_selection import ShuffleSplit # validador cruzado de permutación aleatoria 
 from sklearn.preprocessing import StandardScaler # normalizar datos
 from sklearn.svm import SVC # clasificador SVM
-from sklearn.metrics import accuracy_score # rendimiento para evaluar los splits 
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score,confusion_matrix,ConfusionMatrixDisplay # rendimiento para evaluar los splits 
 from mpl_toolkits.mplot3d import axes3d
 
 
@@ -73,6 +72,8 @@ for train_index,test_index in ss.split(data): # train index indica los indices d
     
 #%% 3. Cargamos splits (siempre)
 
+
+
 train1 = np.loadtxt('train1.txt')
 train2 = np.loadtxt('train2.txt')
 train3 = np.loadtxt('train3.txt')
@@ -105,7 +106,7 @@ labelsTests =[labelsTest1,labelsTest2,labelsTest3,labelsTest4,labelsTest5]
 
 Accuracy=[]
 gama=[0.01,0.05,0.1,0.5,1]
-kernel='rbf' # 'linear'
+kernel='rbf' # 'linear' , 'sigmoid'
 C=1
 for g in gama:
     svm =SVC(kernel=kernel,C=C,gamma=g)
@@ -134,18 +135,51 @@ ax3d.set_ylabel('gama')
 ax3d.set_zlabel('%')
 plt.show()
 #%% 6. Entrenar y guardar sistema entrenado
-from joblib import dump, load
-
+# from joblib import dump, load
+Accuracy=[]
 gama = 0.5
 kernel = 'rbf'
-C=1
+C=1  # parametro de regulacion
 svm =SVC(kernel=kernel,C=C,gamma=g)
-svm.fit(train3,labelsTrain3)
-dump(svm, 'modelo_svm.joblib') 
+
+
+for train,labelsTrain,test,labelsTest in zip(trains, labelsTrains, tests, labelsTests):
+        svm.fit(train,labelsTrain)
+        labels_pred = svm.predict(test)
+        accuracy = accuracy_score(labelsTest,labels_pred)
+        Accuracy.append(accuracy*100)
+
+print(np.mean(Accuracy))
+print(np.std(Accuracy))
+
+cm = confusion_matrix(labelsTest5,labels_pred)
+
+
+ax1 = ConfusionMatrixDisplay(cm, display_labels=['asco','enojo','feliz','neutral','    sorpresa','     triste'])
+ax1.plot()
+
+
+
+
+
+
+
+
+
+
+# fig, ax = plt.subplots(figsize=(15,10))
+# ax.matshow(cm)
+# plt.title('Matriz Confusión',fontsize=20)
+# plt.ylabel('Verdadera')
+# plt.xlabel('Predicha')
+# for (i,j),z in np.ndenumerate(cm):
+#     ax.text(j,i,'{:0.1f}'.format(z), ha ='center',va='center')
+
+# dump(svm, 'modelo_svm.joblib') 
 
 #%% Para cargarlo posteriormente 
-svm1 = load('modelo_svm.joblib')
-labels_pred = svm1.predict(test3)
+# svm1 = load('modelo_svm.joblib')
+# labels_pred = svm1.predict(test3)
 #accuracy = accuracy_score(labelsTest3,labels_pred)
 #print(accuracy)
 
