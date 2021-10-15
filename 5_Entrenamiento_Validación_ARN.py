@@ -13,7 +13,7 @@ from sklearn.model_selection import ShuffleSplit
 from sklearn.preprocessing import StandardScaler 
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score,confusion_matrix,ConfusionMatrixDisplay # rendimiento para evaluar los splits 
-
+import time
 
 
 #%% 2. Cargamos splits (siempre)
@@ -79,46 +79,69 @@ modelos.append(modelo_2)
 
 
 #%%
+Accuracy=[]
+activ_fun = 'relu' # función de activación de capas ocultas , relu, tanh, identity , logistic
+n_iter = 3000
+neuronas=[5,10,15,20,30]
+MLPClassifier(hidden_layer_sizes=(30),max_iter = n_iter,activation = activ_fun)
+for n in neuronas:
+    mlp =MLPClassifier(hidden_layer_sizes=(n),max_iter = n_iter,activation = activ_fun)
+    
+    for train,labelsTrain,test,labelsTest in zip(trains, labelsTrains, tests, labelsTests):
+        mlp.fit(train,labelsTrain)
+        labels_pred = mlp.predict(test)
+        accuracy = accuracy_score(labelsTest,labels_pred)
+        Accuracy.append(accuracy*100)
+#%%
+z = np.asarray(Accuracy)
+z = np.reshape(z,(5,5))
+#z = z.T
+x = [1,2,3,4,5]
+y= [5,10,15,20,30]
+fig = plt.figure()
+ax3d = plt.axes(projection="3d")
+X,Y = np.meshgrid(x,y)
+ax3d.plot_surface(X, Y, z,cmap='plasma',linewidth=0, )
+ax3d.view_init(20, 40)  #25,20
+ax3d.set_title('Accuracy')
+ax3d.set_xlabel('fold')
+ax3d.set_ylabel('neuronas')
+ax3d.set_zlabel('%')
+plt.show()
 
 
-
-#------------------------------------------- Ajuste y  Entrenamiento -------------------------------------------------------------------
-redes= []
-i = 1
-
-print("Ajustando...")
-for modelo in modelos :
-    redes.append(modelo.fit(train5,labelsTrain5))
-
-for red in redes:
-    print("score entrenamiento {} = {}".format(i,red.score(train5,labelsTrain5))) # calculamos error de entrenamiento
-    i+=1
+#%%
 
 #---------------- ---------------------------------- Fase de Prueba -----------------------------------------------------------------
 print("\n------------------------------------------------\n")
-i = 1
-for red in redes:
-    print("score prueba {} = {}".format(i,  red.score(test5,labelsTest5))) # calculamos error de entrenamiento 
-    i += 1
+
 
 Accuracy=[]
+Accuracy_train=[]
+train_times = []
 for train,labelsTrain,test,labelsTest in zip(trains, labelsTrains, tests, labelsTests):
-        modelo_2.fit(train,labelsTrain)
-        labels_pred = modelo_2.predict(test)
-        accuracy = accuracy_score(labelsTest,labels_pred)
-        Accuracy.append(accuracy*100)
+    #Entrenamiento
+    inicio = time.time()
+    modelo_2.fit(train,labelsTrain)
+    train_times.append(time.time()-inicio)
+    Accuracy_train.append(modelo_2.score(train,labelsTrain))
+    #Prueba
+    labels_pred = modelo_2.predict(test)
+    accuracy = accuracy_score(labelsTest,labels_pred)
+    Accuracy.append(accuracy*100)
 
-print(np.mean(Accuracy))
-print(np.std(Accuracy))
+print ("mean train accuracy: {}".format(np.mean(Accuracy_train)))
+print ("mean train time: {}".format(np.mean(train_times)))
+print("mean accuracy: {}".format(np.mean(Accuracy)))
+print("std accuracy: {}".format(np.std(Accuracy)))
 
 cm = confusion_matrix(labelsTest5,labels_pred)
 cmp = ConfusionMatrixDisplay(cm, display_labels=['asco','enojo','feliz','neutral','    sorpresa','     triste'])
 
 fig, ax = plt.subplots(figsize=(8,8))
-ax.set_title("Matriz de Confusión ",fontsize=20)
+ax.set_title("Matriz de Confusión MLP",fontsize=20)
 cmp.plot(ax =ax)
-#ax1.set_title('Matriz')
-#ax1.plot()
+
 
 
 

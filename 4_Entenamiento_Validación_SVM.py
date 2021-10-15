@@ -18,6 +18,8 @@ from sklearn.preprocessing import StandardScaler # normalizar datos
 from sklearn.svm import SVC # clasificador SVM
 from sklearn.metrics import accuracy_score,confusion_matrix,ConfusionMatrixDisplay # rendimiento para evaluar los splits 
 from mpl_toolkits.mplot3d import axes3d
+import time
+from sklearn.multiclass import OneVsRestClassifier
 
 
 
@@ -134,29 +136,85 @@ ax3d.set_xlabel('fold')
 ax3d.set_ylabel('gama')
 ax3d.set_zlabel('%')
 plt.show()
-#%% 6. Entrenar y guardar sistema entrenado
-# from joblib import dump, load
+#%% 6. Entrenar    SVM multiclasficación , onve vs one 
+
+print("------ SVM one vs one----------")
 Accuracy=[]
+train_times=[]
+Accuracy_train=[]
 gama = 0.5
 kernel = 'rbf'
 C=1  # parametro de regulacion
-svm =SVC(kernel=kernel,C=C,gamma=g)
+svm =SVC(kernel=kernel,C=C,gamma=gama)
 
 
 for train,labelsTrain,test,labelsTest in zip(trains, labelsTrains, tests, labelsTests):
-        svm.fit(train,labelsTrain)
-        labels_pred = svm.predict(test)
-        accuracy = accuracy_score(labelsTest,labels_pred)
-        Accuracy.append(accuracy*100)
+    #Entrenamiento
+    inicio = time.time()
+    svm.fit(train,labelsTrain)
+    train_times.append(time.time()-inicio)
+    Accuracy_train.append(svm.score(train,labelsTrain))
+    #Prueba
+    labels_pred = svm.predict(test)
+    accuracy = accuracy_score(labelsTest,labels_pred)
+    Accuracy.append(accuracy*100)
 
-print(np.mean(Accuracy))
-print(np.std(Accuracy))
+print ("mean train accuracy: {}".format(np.mean(Accuracy_train)))
+print ("mean train time: {}".format(np.mean(train_times)))
+print("mean accuracy: {}".format(np.mean(Accuracy)))
+print("std accuracy: {}".format(np.std(Accuracy)))
 
 cm = confusion_matrix(labelsTest5,labels_pred)
 
 
-ax1 = ConfusionMatrixDisplay(cm, display_labels=['asco','enojo','feliz','neutral','    sorpresa','     triste'])
-ax1.plot()
+
+cmp = ConfusionMatrixDisplay(cm, display_labels=['asco','enojo','feliz','neutral','    sorpresa','     triste'])
+
+fig, ax = plt.subplots(figsize=(8,8))
+ax.set_title("Matriz de Confusión SVM one vs one ",fontsize=20)
+cmp.plot(ax =ax)
+
+#%% 7. Entrenar    SVM multiclasficación , onve vs all 
+
+print("------ SVM one vs all----------")
+
+
+Accuracy=[]
+train_times=[]
+Accuracy_train=[]
+gama = 0.5
+kernel = 'rbf'
+C=1  # parametro de regulacion
+svm =SVC(kernel=kernel,C=C,gamma=gama)
+ovr = OneVsRestClassifier(svm)  # define the ovr strategy
+
+
+
+for train,labelsTrain,test,labelsTest in zip(trains, labelsTrains, tests, labelsTests):
+    #Entrenamiento
+    inicio = time.time()
+    ovr.fit(train,labelsTrain)
+    labels_pred = ovr.predict(train)
+    train_times.append(time.time()-inicio)
+    accuracyTrain = accuracy_score(labelsTrain,labels_pred)
+    #Prueba
+    labels_pred = ovr.predict(test)
+    accuracy = accuracy_score(labelsTest,labels_pred)
+    Accuracy.append(accuracy*100)
+
+
+print ("mean train accuracy: {}".format(np.mean(accuracyTrain)))
+print ("mean train time: {}".format(np.mean(train_times)))
+print("mean accuracy: {}".format(np.mean(Accuracy)))
+print("std accuracy: {}".format(np.std(Accuracy)))
+
+cm = confusion_matrix(labelsTest5,labels_pred)
+
+cmp = ConfusionMatrixDisplay(cm, display_labels=['asco','enojo','feliz','neutral','    sorpresa','     triste'])
+
+fig, ax = plt.subplots(figsize=(8,8))
+ax.set_title("Matriz de Confusión SVM one vs all",fontsize=20)
+cmp.plot(ax =ax)
 
 
 
@@ -167,21 +225,6 @@ ax1.plot()
 
 
 
-# fig, ax = plt.subplots(figsize=(15,10))
-# ax.matshow(cm)
-# plt.title('Matriz Confusión',fontsize=20)
-# plt.ylabel('Verdadera')
-# plt.xlabel('Predicha')
-# for (i,j),z in np.ndenumerate(cm):
-#     ax.text(j,i,'{:0.1f}'.format(z), ha ='center',va='center')
-
-# dump(svm, 'modelo_svm.joblib') 
-
-#%% Para cargarlo posteriormente 
-# svm1 = load('modelo_svm.joblib')
-# labels_pred = svm1.predict(test3)
-#accuracy = accuracy_score(labelsTest3,labels_pred)
-#print(accuracy)
 
 
 
